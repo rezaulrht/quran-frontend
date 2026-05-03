@@ -24,7 +24,7 @@ interface IconSidebarProps {
 
 export function IconSidebar({ activeIndex = 0 }: IconSidebarProps) {
   return (
-    <aside className="fixed left-0 top-0 z-20 flex h-full w-[50px] flex-col items-center border-r border-qm-border bg-qm-bg py-3">
+    <aside className="fixed left-0 top-0 z-20 flex h-full w-[50px] flex-col items-center border-r border-qm-border2 bg-qm-bg py-3">
       {/* Logo */}
       <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-md bg-[#22c55e]">
         <BookOpen size={18} className="text-white" />
