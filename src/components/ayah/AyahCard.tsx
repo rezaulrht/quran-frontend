@@ -1,7 +1,8 @@
 'use client'
 
-import { Play, Bookmark, MoreHorizontal } from 'lucide-react'
+import { Bookmark, MoreHorizontal } from 'lucide-react'
 import { useSettingsStore } from '@/store/settingsStore'
+import { AudioButton } from '@/components/audio/AudioButton'
 import type { Verse } from '@/types/quran'
 
 interface AyahCardProps {
@@ -21,13 +22,7 @@ export function AyahCard({ verse, surahId }: AyahCardProps) {
         <span className="text-[16px] font-semibold leading-[26px] text-qm-arabic">
           {surahId}:{verse.verse_number}
         </span>
-        <button
-          type="button"
-          className="text-qm-text-faint transition-colors hover:text-qm-green"
-          aria-label={`Play ayah ${surahId}:${verse.verse_number}`}
-        >
-          <Play size={18} />
-        </button>
+        <AudioButton globalVerseNumber={verse.global_verse_number} />
         <button
           type="button"
           className="text-qm-text-faint transition-colors hover:text-qm-text"
