@@ -44,6 +44,11 @@ async function fetchAudioUrls(
   return { primary, fallback: json.data.audio }
 }
 
+// Exported so MobileAudioPlayer can attach timeupdate/durationchange listeners.
+export function getGlobalAudio(): HTMLAudioElement | null {
+  return globalAudio
+}
+
 // Exported so AyahCard can trigger the next verse without a hook instance.
 export function triggerAutoPlay(globalVerseNumber: number): void {
   const audio = globalAudio
