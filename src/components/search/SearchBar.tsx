@@ -19,34 +19,22 @@ export function SearchBar({ onNavigate }: SearchBarProps) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const router = useRouter()
 
-  const runSearch = useCallback(
-    async (q: string) => {
-      if (q.length < 2) {
-        setResults([])
-        setIsOpen(false)
-        return
-      }
-      setIsLoading(true)
-      try {
-        const data = await searchAyahs(q)
-        setResults(data)
-        setIsOpen(true)
-      } catch {
-        setResults([])
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    [],
-  )
+  const runSearch = useCallback(async (q: string) => {
+    setIsLoading(true)
+    try {
+      const data = await searchAyahs(q)
+      setResults(data)
+      setIsOpen(true)
+    } catch {
+      setResults([])
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current)
-    if (query.length < 2) {
-      setResults([])
-      setIsOpen(false)
-      return
-    }
+    if (query.length < 2) return
     timerRef.current = setTimeout(() => {
       void runSearch(query)
     }, 300)
@@ -64,6 +52,14 @@ export function SearchBar({ onNavigate }: SearchBarProps) {
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
+
+  function handleQueryChange(value: string) {
+    setQuery(value)
+    if (value.length < 2) {
+      setResults([])
+      setIsOpen(false)
+    }
+  }
 
   function handleSelect(result: SearchResult) {
     router.push(`/surah/${result.surah_id}`)
@@ -83,7 +79,7 @@ export function SearchBar({ onNavigate }: SearchBarProps) {
         <input
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => handleQueryChange(e.target.value)}
           placeholder="Search ayahs..."
           className="w-full bg-transparent text-sm text-qm-text placeholder-qm-text-faint outline-none"
         />

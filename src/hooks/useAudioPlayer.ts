@@ -120,10 +120,6 @@ export function useAudioPlayer(
     }
   }, [globalVerseNumber, onEnded])
 
-  useEffect(() => {
-    if (!isThisPlaying) setIsLoading(false)
-  }, [isThisPlaying])
-
   function toggle() {
     const audio = globalAudio
     if (!audio) return
@@ -184,5 +180,5 @@ export function useAudioPlayer(
     })()
   }
 
-  return { isPlaying: isThisPlaying, isLoading, error, toggle }
+  return { isPlaying: isThisPlaying, isLoading: isLoading && isThisPlaying, error, toggle }
 }

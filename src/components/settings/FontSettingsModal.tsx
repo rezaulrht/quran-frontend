@@ -37,8 +37,6 @@ export function FontSettingsModal() {
 
   if (!isOpen) return null
 
-  const selectedFontLabel = FONT_OPTIONS.find((o) => o.value === arabicFont)?.label ?? 'KFGQ'
-
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-qm-bg">
       {/* Header */}
