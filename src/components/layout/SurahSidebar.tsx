@@ -138,13 +138,10 @@ export function SurahSidebar() {
           <button
             type="button"
             onClick={() => { setSidebarOpen(false); setSearchModalOpen(true) }}
-            className="mx-3 mb-3 flex w-[calc(100%-24px)] items-center gap-2 rounded-md border border-qm-border2 bg-qm-surface2 px-3 py-2 text-left transition-colors hover:border-qm-green"
+            className="mx-3 mb-3 flex w-[calc(100%-24px)] items-center gap-2 rounded-md border border-qm-border2 bg-qm-surface2 px-3 py-2 text-left"
           >
             <Search size={14} className="shrink-0 text-qm-text-faint" />
             <span className="flex-1 text-sm text-qm-text-faint">Search Ayahs...</span>
-            <kbd className="rounded border border-qm-border2 px-1.5 py-0.5 text-[10px] text-qm-text-faint">
-              Ctrl+K
-            </kbd>
           </button>
 
           {/* Surah list */}
