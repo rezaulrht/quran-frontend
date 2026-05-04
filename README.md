@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Quran Web Application
 
-## Getting Started
+## Live Demo
+[Live Demo](https://your-app.vercel.app)
 
-First, run the development server:
+## Project Overview
+A Quran web application cloning the UI of quranmazid.com/1, built as a Junior Web Developer technical assessment. Features surah navigation, ayah reader with Arabic text and English translation, per-ayah audio playback, search, font settings, and responsive design.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Features
+- Left icon sidebar cloned from reference design
+- Scrollable surah sidebar with all 114 surahs (Arabic name, English name, number)
+- Ayah reader with Arabic text (RTL, KFGQ font), English translation, verse numbers
+- Per-ayah audio playback using Mishary Al-Afasy recitation
+- Search ayahs by Arabic or English text across all 114 surahs
+- Font settings panel: 2 Arabic fonts, Arabic size slider, translation size slider
+- Settings persisted via localStorage
+- Dark theme matching QuranMazid reference design
+- Fully responsive: desktop, tablet, mobile with drawer sidebar and bottom player
+
+## Tech Stack
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 15, TypeScript, Tailwind CSS, Zustand |
+| Backend | Node.js, Express, TypeScript |
+| Data | Quran JSON (github.com/risan/quran-json) |
+| Audio | AlQuran Cloud API (api.alquran.cloud) |
+| Deployment | Vercel (frontend + backend) |
+
+## Project Structure
+```
+quran-web-app/     ← Next.js frontend
+quran-backend/     ← Express API backend
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Backend
+```bash
+cd quran-backend
+npm install
+npm run dev
+```
+Runs on http://localhost:5000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Frontend
+```bash
+cd quran-web-app
+npm install
+npm run dev
+```
+Runs on http://localhost:3000
 
-## Learn More
+## Data Source
+Quran JSON from https://github.com/risan/quran-json
+Translation: Saheeh International
 
-To learn more about Next.js, take a look at the following resources:
+## Audio Source
+https://api.alquran.cloud/v1/ayah/{verseNumber}/ar.alafasy
+Reciter: Mishary Rashid Al-Afasy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Assessment Requirements Covered
+- [x] Left icon sidebar
+- [x] Surah sidebar with all 114 surahs
+- [x] Ayah page: Arabic text, English translation, verse numbers, surah header
+- [x] Per-ayah audio playback
+- [x] Search by Arabic and English text
+- [x] Font settings with localStorage persistence
+- [x] Dark theme matching QuranMazid
+- [x] Fully responsive (mobile, tablet, desktop)
+- [x] TypeScript throughout
+- [x] SSG with generateStaticParams
+- [x] Deployed on Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Known Limitations
+- Audio depends on AlQuran Cloud API availability
+- KFGQ font loads from external CDN on first visit
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Submission Notes
+Built for Junior Web Developer technical assessment.
+Tested in incognito mode before submission.
