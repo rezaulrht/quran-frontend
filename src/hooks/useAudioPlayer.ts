@@ -18,6 +18,9 @@ const endedCallbacks = new Map<number, () => void>()
 // Cache of fetched audio URLs to eliminate repeat API calls
 const audioUrlCache = new Map<number, { primary: string; fallback: string }>()
 
+// Registry of verse metadata so triggerAutoPlay can display correct surah/verse info
+const verseMetaRegistry = new Map<number, { surahName: string; verseNumber: number }>()
+
 // ONE 'ended' listener on the singleton — never added again
 globalAudio?.addEventListener('ended', () => {
   const { setPlaying } = useAudioStore.getState()
@@ -73,6 +76,7 @@ export function triggerAutoPlay(globalVerseNumber: number): void {
   if (!audio) return
 
   const { setPlaying } = useAudioStore.getState()
+  const meta = verseMetaRegistry.get(globalVerseNumber)
 
   audio.pause()
   audio.src = ''
@@ -85,7 +89,7 @@ export function triggerAutoPlay(globalVerseNumber: number): void {
       if (myGen !== playGeneration) return
 
       currentLoadedVerse = globalVerseNumber
-      setPlaying(globalVerseNumber, true)
+      setPlaying(globalVerseNumber, true, meta?.surahName, meta?.verseNumber)
       audio.src = primary
 
       audio.addEventListener(
@@ -118,6 +122,8 @@ interface UseAudioPlayerReturn {
 
 export function useAudioPlayer(
   globalVerseNumber: number,
+  surahName: string,
+  verseNumber: number,
   onEnded?: () => void,
 ): UseAudioPlayerReturn {
   const currentPlayingId = useAudioStore((s) => s.currentPlayingId)
@@ -128,6 +134,12 @@ export function useAudioPlayer(
   const [error, setError] = useState<string | null>(null)
 
   const isThisPlaying = currentPlayingId === globalVerseNumber && storeIsPlaying
+
+  // Register this verse's metadata so triggerAutoPlay can display it
+  useEffect(() => {
+    verseMetaRegistry.set(globalVerseNumber, { surahName, verseNumber })
+    return () => { verseMetaRegistry.delete(globalVerseNumber) }
+  }, [globalVerseNumber, surahName, verseNumber])
 
   // Keep Map current so the singleton's ended listener fires the right callback.
   useEffect(() => {
@@ -167,7 +179,7 @@ export function useAudioPlayer(
         if (myGen !== playGeneration) return
 
         currentLoadedVerse = globalVerseNumber
-        setPlaying(globalVerseNumber, true)
+        setPlaying(globalVerseNumber, true, surahName, verseNumber)
         audio.src = primary
 
         audio.addEventListener('canplay', () => setIsLoading(false), { once: true })

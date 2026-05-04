@@ -5,11 +5,13 @@ import { useAudioPlayer } from '@/hooks/useAudioPlayer'
 
 interface AudioButtonProps {
   globalVerseNumber: number
+  surahName: string
+  verseNumber: number
   onEnded?: () => void
 }
 
-export function AudioButton({ globalVerseNumber, onEnded }: AudioButtonProps) {
-  const { isPlaying, isLoading, toggle } = useAudioPlayer(globalVerseNumber, onEnded)
+export function AudioButton({ globalVerseNumber, surahName, verseNumber, onEnded }: AudioButtonProps) {
+  const { isPlaying, isLoading, toggle } = useAudioPlayer(globalVerseNumber, surahName, verseNumber, onEnded)
 
   return (
     <button

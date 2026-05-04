@@ -55,6 +55,7 @@ export default async function SurahPage({ params }: SurahPageProps) {
             key={verse.id}
             verse={verse}
             surahId={surah.id}
+            surahName={surah.transliteration}
             nextGlobalVerseNumber={surah.verses[idx + 1]?.global_verse_number}
           />
         ))}

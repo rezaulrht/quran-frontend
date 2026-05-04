@@ -9,6 +9,8 @@ export function BottomAudioPlayer() {
   const currentPlayingId = useAudioStore((s) => s.currentPlayingId)
   const isPlaying = useAudioStore((s) => s.isPlaying)
   const setPlaying = useAudioStore((s) => s.setPlaying)
+  const currentSurahName = useAudioStore((s) => s.currentSurahName)
+  const currentVerseNumber = useAudioStore((s) => s.currentVerseNumber)
 
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -93,7 +95,7 @@ export function BottomAudioPlayer() {
         {/* Verse info — left */}
         <div className="hidden min-w-0 flex-col md:flex" style={{ width: '160px' }}>
           <span className="truncate text-xs font-medium text-qm-text">
-            Verse {currentPlayingId}
+            {currentSurahName || 'Loading...'} : {currentVerseNumber || '—'}
           </span>
           <span className="text-[11px] text-qm-text-muted">Al-Afasy</span>
         </div>
