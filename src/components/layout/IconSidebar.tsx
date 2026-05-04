@@ -39,10 +39,13 @@ export function IconSidebar({ activeIndex = 0 }: IconSidebarProps) {
         type="button"
         aria-label="Search ayahs (Ctrl+K)"
         onClick={() => setSearchModalOpen(true)}
-        className="mb-4 flex h-9 w-9 items-center justify-center rounded-md text-qm-text-faint transition-colors hover:bg-qm-surface2 hover:text-qm-green"
+        className="group relative mb-4 flex h-9 w-9 items-center justify-center rounded-md text-qm-text-faint transition-colors hover:bg-qm-surface2 hover:text-qm-green"
         title="Search ayahs (Ctrl+K)"
       >
         <Search size={18} />
+        <span className="absolute -bottom-1 -right-1 rounded bg-qm-border2 px-0.5 text-[8px] leading-tight text-qm-text-faint opacity-70">
+          ^K
+        </span>
       </button>
 
       {/* Nav icons */}

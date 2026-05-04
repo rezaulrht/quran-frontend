@@ -24,6 +24,7 @@ export function SurahSidebar() {
   const setSidebarOpen = useUIStore((s) => s.setSidebarOpen)
   const isSidebarSearchOpen = useUIStore((s) => s.isSidebarSearchOpen)
   const setSidebarSearchOpen = useUIStore((s) => s.setSidebarSearchOpen)
+  const setSearchModalOpen = useUIStore((s) => s.setSearchModalOpen)
 
   // Activate search mode when triggered externally (e.g. mobile header search icon)
   useEffect(() => {
@@ -120,7 +121,7 @@ export function SurahSidebar() {
       ) : (
         <>
           {/* Surah filter input */}
-          <div className="px-3 pb-3">
+          <div className="px-3 pb-2">
             <div className="flex items-center gap-2 rounded-md border border-qm-border2 bg-qm-surface2 px-3 py-2">
               <Search size={14} className="shrink-0 text-qm-text-faint" />
               <input
@@ -132,6 +133,19 @@ export function SurahSidebar() {
               />
             </div>
           </div>
+
+          {/* Ayah search trigger */}
+          <button
+            type="button"
+            onClick={() => { setSidebarOpen(false); setSearchModalOpen(true) }}
+            className="mx-3 mb-3 flex w-[calc(100%-24px)] items-center gap-2 rounded-md border border-dashed border-qm-border2 bg-qm-surface2/50 px-3 py-2 text-left transition-colors hover:border-qm-green hover:bg-qm-surface2"
+          >
+            <Search size={14} className="shrink-0 text-qm-green" />
+            <span className="flex-1 text-sm text-qm-text-faint">Search Ayahs...</span>
+            <kbd className="rounded border border-qm-border2 px-1.5 py-0.5 text-[10px] text-qm-text-faint">
+              Ctrl+K
+            </kbd>
+          </button>
 
           {/* Surah list */}
           <div className="surah-sidebar-scroll flex-1 overflow-y-auto">
