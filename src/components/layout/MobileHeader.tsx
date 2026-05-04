@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { Menu, Search, MoonStar, Settings2 } from 'lucide-react'
 import { useUIStore } from '@/store/uiStore'
 
@@ -18,9 +19,9 @@ export function MobileHeader() {
         <Menu size={20} />
       </button>
 
-      <span className="flex-1 text-center text-sm font-medium text-qm-text">
-        Quran Web App
-      </span>
+      <div className="flex flex-1 items-center justify-center">
+        <Image src="/quran_logo.png" alt="Quran Web App" width={32} height={32} className="rounded-md" />
+      </div>
 
       <div className="flex items-center">
         <button
