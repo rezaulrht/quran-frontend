@@ -63,8 +63,13 @@ export default async function SurahPage({ params }: SurahPageProps) {
 
       {/* Ayah list */}
       <div>
-        {surah.verses.map((verse) => (
-          <AyahCard key={verse.id} verse={verse} surahId={surah.id} />
+        {surah.verses.map((verse, idx) => (
+          <AyahCard
+            key={verse.id}
+            verse={verse}
+            surahId={surah.id}
+            nextGlobalVerseNumber={surah.verses[idx + 1]?.global_verse_number}
+          />
         ))}
       </div>
     </div>

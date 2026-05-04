@@ -1,19 +1,28 @@
 'use client'
 
+import { useCallback } from 'react'
 import { Bookmark, MoreHorizontal } from 'lucide-react'
 import { useSettingsStore } from '@/store/settingsStore'
 import { AudioButton } from '@/components/audio/AudioButton'
+import { triggerAutoPlay } from '@/hooks/useAudioPlayer'
 import type { Verse } from '@/types/quran'
 
 interface AyahCardProps {
   verse: Verse
   surahId: number
+  nextGlobalVerseNumber?: number
 }
 
-export function AyahCard({ verse, surahId }: AyahCardProps) {
+export function AyahCard({ verse, surahId, nextGlobalVerseNumber }: AyahCardProps) {
   const arabicFontSize = useSettingsStore((s) => s.arabicFontSize)
   const arabicFont = useSettingsStore((s) => s.arabicFont)
   const translationFontSize = useSettingsStore((s) => s.translationFontSize)
+
+  const handleEnded = useCallback(() => {
+    if (nextGlobalVerseNumber !== undefined) {
+      triggerAutoPlay(nextGlobalVerseNumber)
+    }
+  }, [nextGlobalVerseNumber])
 
   return (
     <div className="flex gap-4 border-b border-qm-border py-6">
@@ -22,7 +31,10 @@ export function AyahCard({ verse, surahId }: AyahCardProps) {
         <span className="text-[16px] font-semibold leading-[26px] text-qm-arabic">
           {surahId}:{verse.verse_number}
         </span>
-        <AudioButton globalVerseNumber={verse.global_verse_number} />
+        <AudioButton
+          globalVerseNumber={verse.global_verse_number}
+          onEnded={nextGlobalVerseNumber !== undefined ? handleEnded : undefined}
+        />
         <button
           type="button"
           className="text-qm-text-faint transition-colors hover:text-qm-text"
@@ -45,7 +57,6 @@ export function AyahCard({ verse, surahId }: AyahCardProps) {
           dir="rtl"
           lang="ar"
           className="text-right leading-[60px] text-qm-arabic"
-          /* eslint-disable-next-line react/forbid-component-props */
           style={{ fontSize: `${arabicFontSize}px`, fontFamily: arabicFont }}
         >
           {verse.text}
