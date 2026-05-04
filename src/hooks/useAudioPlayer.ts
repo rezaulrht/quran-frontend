@@ -9,29 +9,39 @@ let globalAudio: HTMLAudioElement | null = null
 // fire the next verse's callback even when triggered outside React.
 const endedCallbacks = new Map<number, () => void>()
 
-function cdnUrl(globalVerseNumber: number, cdn: 'primary' | 'fallback'): string {
-  if (cdn === 'primary') {
-    const padded = String(globalVerseNumber).padStart(3, '0')
-    return `https://verses.quran.com/Alafasy/mp3/${padded}.mp3`
+interface AlQuranAyahResponse {
+  data: {
+    audio: string
+    audioSecondary: string[]
   }
-  return `https://cdn.alquran.cloud/media/audio/ayah/ar.alafasy/128/${globalVerseNumber}`
 }
 
-function createAudio(
+async function fetchAudioUrls(
   globalVerseNumber: number,
-  onCanPlay: () => void,
+): Promise<{ primary: string; fallback: string }> {
+  const res = await fetch(
+    `https://api.alquran.cloud/v1/ayah/${globalVerseNumber}/ar.alafasy`,
+  )
+  if (!res.ok) throw new Error(`AlQuran API error: ${res.status}`)
+  const json = (await res.json()) as AlQuranAyahResponse
+  const primary = json.data.audioSecondary[0] ?? json.data.audio
+  return { primary, fallback: json.data.audio }
+}
+
+function attachAndPlay(
+  audio: HTMLAudioElement,
+  primary: string,
+  fallback: string,
   onEnded: () => void,
   onFinalError: () => void,
-): HTMLAudioElement {
-  const audio = new Audio(cdnUrl(globalVerseNumber, 'primary'))
+): void {
+  audio.src = primary
 
-  audio.addEventListener('canplay', onCanPlay, { once: true })
   audio.addEventListener('ended', onEnded, { once: true })
   audio.addEventListener(
     'error',
     () => {
-      // Primary CDN failed — swap to fallback
-      audio.src = cdnUrl(globalVerseNumber, 'fallback')
+      audio.src = fallback
       audio.addEventListener('error', onFinalError, { once: true })
       audio.load()
       void audio.play().catch(onFinalError)
@@ -39,7 +49,7 @@ function createAudio(
     { once: true },
   )
 
-  return audio
+  void audio.play().catch(onFinalError)
 }
 
 // Exported so AyahCard can trigger the next verse without needing a hook instance.
@@ -51,22 +61,29 @@ export function triggerAutoPlay(globalVerseNumber: number): void {
     globalAudio.src = ''
   }
 
-  const audio = createAudio(
-    globalVerseNumber,
-    () => {},
-    () => {
-      setPlaying(globalVerseNumber, false)
-      endedCallbacks.get(globalVerseNumber)?.()
-    },
-    () => {
-      setPlaying(null, false)
-      console.error(`Auto-play failed for verse ${globalVerseNumber}`)
-    },
-  )
+  void fetchAudioUrls(globalVerseNumber)
+    .then(({ primary, fallback }) => {
+      const audio = new Audio()
+      globalAudio = audio
+      setPlaying(globalVerseNumber, true)
 
-  globalAudio = audio
-  setPlaying(globalVerseNumber, true)
-  void audio.play().catch(() => setPlaying(null, false))
+      attachAndPlay(
+        audio,
+        primary,
+        fallback,
+        () => {
+          setPlaying(globalVerseNumber, false)
+          endedCallbacks.get(globalVerseNumber)?.()
+        },
+        () => {
+          setPlaying(null, false)
+          console.error(`Auto-play failed for verse ${globalVerseNumber}`)
+        },
+      )
+    })
+    .catch(() => {
+      console.error(`Failed to fetch audio URL for verse ${globalVerseNumber}`)
+    })
 }
 
 interface UseAudioPlayerReturn {
@@ -120,29 +137,37 @@ export function useAudioPlayer(
     setError(null)
     setIsLoading(true)
 
-    const audio = createAudio(
-      globalVerseNumber,
-      () => setIsLoading(false),
-      () => {
-        setPlaying(globalVerseNumber, false)
-        endedCallbacks.get(globalVerseNumber)?.()
-      },
-      () => {
-        setIsLoading(false)
-        setError('Failed to load audio')
-        setPlaying(null, false)
-        console.error(`Audio failed for verse ${globalVerseNumber}`)
-      },
-    )
+    void (async () => {
+      try {
+        const { primary, fallback } = await fetchAudioUrls(globalVerseNumber)
 
-    globalAudio = audio
-    setPlaying(globalVerseNumber, true)
-    void audio.play().catch((err: unknown) => {
-      setIsLoading(false)
-      setError('Playback failed')
-      setPlaying(null, false)
-      console.error('Audio play failed:', err)
-    })
+        const audio = new Audio()
+        globalAudio = audio
+        setPlaying(globalVerseNumber, true)
+
+        audio.addEventListener('canplay', () => setIsLoading(false), { once: true })
+
+        attachAndPlay(
+          audio,
+          primary,
+          fallback,
+          () => {
+            setPlaying(globalVerseNumber, false)
+            endedCallbacks.get(globalVerseNumber)?.()
+          },
+          () => {
+            setIsLoading(false)
+            setError('Failed to load audio')
+            setPlaying(null, false)
+            console.error(`Audio failed for verse ${globalVerseNumber}`)
+          },
+        )
+      } catch (err) {
+        setIsLoading(false)
+        setError('Failed to fetch audio URL')
+        console.error('Audio URL fetch failed:', err)
+      }
+    })()
   }
 
   return { isPlaying: isThisPlaying, isLoading, error, toggle }
