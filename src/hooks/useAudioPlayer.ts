@@ -3,11 +3,27 @@
 import { useState, useEffect } from 'react'
 import { useAudioStore } from '@/store/audioStore'
 
-let globalAudio: HTMLAudioElement | null = null
+// Single global audio instance shared across ALL ayah cards
+const globalAudio = typeof window !== 'undefined' ? new Audio() : null
 
-// Each AyahCard registers its onEnded here so auto-continued playback can
-// fire the next verse's callback even when triggered outside React.
+// Which verse is currently loaded into globalAudio
+let currentLoadedVerse: number | null = null
+
+// Increment on each new play attempt so stale fetch results are discarded
+let playGeneration = 0
+
+// AyahCards register their auto-continue callbacks here
 const endedCallbacks = new Map<number, () => void>()
+
+// ONE 'ended' listener on the singleton — never added again
+globalAudio?.addEventListener('ended', () => {
+  const { setPlaying } = useAudioStore.getState()
+  if (currentLoadedVerse !== null) {
+    setPlaying(currentLoadedVerse, false)
+    endedCallbacks.get(currentLoadedVerse)?.()
+    currentLoadedVerse = null
+  }
+})
 
 interface AlQuranAyahResponse {
   data: {
@@ -28,61 +44,42 @@ async function fetchAudioUrls(
   return { primary, fallback: json.data.audio }
 }
 
-function attachAndPlay(
-  audio: HTMLAudioElement,
-  primary: string,
-  fallback: string,
-  onEnded: () => void,
-  onFinalError: () => void,
-): void {
-  audio.src = primary
-
-  audio.addEventListener('ended', onEnded, { once: true })
-  audio.addEventListener(
-    'error',
-    () => {
-      audio.src = fallback
-      audio.addEventListener('error', onFinalError, { once: true })
-      audio.load()
-      void audio.play().catch(onFinalError)
-    },
-    { once: true },
-  )
-
-  void audio.play().catch(onFinalError)
-}
-
-// Exported so AyahCard can trigger the next verse without needing a hook instance.
+// Exported so AyahCard can trigger the next verse without a hook instance.
 export function triggerAutoPlay(globalVerseNumber: number): void {
+  const audio = globalAudio
+  if (!audio) return
+
   const { setPlaying } = useAudioStore.getState()
 
-  if (globalAudio) {
-    globalAudio.pause()
-    globalAudio.src = ''
-  }
+  audio.pause()
+  audio.src = ''
+  audio.load()
+  playGeneration++
+  const myGen = playGeneration
 
   void fetchAudioUrls(globalVerseNumber)
     .then(({ primary, fallback }) => {
-      const audio = new Audio()
-      globalAudio = audio
-      setPlaying(globalVerseNumber, true)
+      if (myGen !== playGeneration) return
 
-      attachAndPlay(
-        audio,
-        primary,
-        fallback,
+      currentLoadedVerse = globalVerseNumber
+      setPlaying(globalVerseNumber, true)
+      audio.src = primary
+
+      audio.addEventListener(
+        'error',
         () => {
-          setPlaying(globalVerseNumber, false)
-          endedCallbacks.get(globalVerseNumber)?.()
+          audio.src = fallback
+          audio.load()
+          void audio.play().catch(() => setPlaying(null, false))
         },
-        () => {
-          setPlaying(null, false)
-          console.error(`Auto-play failed for verse ${globalVerseNumber}`)
-        },
+        { once: true },
       )
+
+      audio.load()
+      void audio.play().catch(() => setPlaying(null, false))
     })
     .catch(() => {
-      console.error(`Failed to fetch audio URL for verse ${globalVerseNumber}`)
+      console.error(`Failed to fetch audio for verse ${globalVerseNumber}`)
     })
 }
 
@@ -106,7 +103,7 @@ export function useAudioPlayer(
 
   const isThisPlaying = currentPlayingId === globalVerseNumber && storeIsPlaying
 
-  // Keep the Map current so triggerAutoPlay can fire the right callback.
+  // Keep Map current so the singleton's ended listener fires the right callback.
   useEffect(() => {
     if (onEnded) {
       endedCallbacks.set(globalVerseNumber, onEnded)
@@ -123,45 +120,57 @@ export function useAudioPlayer(
   }, [isThisPlaying])
 
   function toggle() {
+    const audio = globalAudio
+    if (!audio) return
+
     if (isThisPlaying) {
-      globalAudio?.pause()
+      audio.pause()
       setPlaying(globalVerseNumber, false)
       return
     }
 
-    if (globalAudio) {
-      globalAudio.pause()
-      globalAudio.src = ''
-    }
+    audio.pause()
+    audio.src = ''
+    audio.load()
 
     setError(null)
     setIsLoading(true)
+    playGeneration++
+    const myGen = playGeneration
 
     void (async () => {
       try {
         const { primary, fallback } = await fetchAudioUrls(globalVerseNumber)
 
-        const audio = new Audio()
-        globalAudio = audio
+        if (myGen !== playGeneration) return
+
+        currentLoadedVerse = globalVerseNumber
         setPlaying(globalVerseNumber, true)
+        audio.src = primary
 
         audio.addEventListener('canplay', () => setIsLoading(false), { once: true })
 
-        attachAndPlay(
-          audio,
-          primary,
-          fallback,
+        audio.addEventListener(
+          'error',
           () => {
-            setPlaying(globalVerseNumber, false)
-            endedCallbacks.get(globalVerseNumber)?.()
+            audio.src = fallback
+            audio.load()
+            void audio.play().catch(() => {
+              setIsLoading(false)
+              setError('Failed to load audio')
+              setPlaying(null, false)
+            })
           },
-          () => {
-            setIsLoading(false)
-            setError('Failed to load audio')
-            setPlaying(null, false)
-            console.error(`Audio failed for verse ${globalVerseNumber}`)
-          },
+          { once: true },
         )
+
+        audio.load()
+        void audio.play().catch((err: unknown) => {
+          setIsLoading(false)
+          setError('Playback failed')
+          setPlaying(null, false)
+          console.error('Audio play failed:', err)
+        })
       } catch (err) {
         setIsLoading(false)
         setError('Failed to fetch audio URL')
