@@ -16,6 +16,6 @@ export async function getSurah(id: number): Promise<SurahWithVerses> {
 
 export async function searchAyahs(query: string): Promise<SearchResult[]> {
   const res = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(query)}`)
-  if (!res.ok) throw new Error(`searchAyahs failed: ${res.status}`)
+  if (!res.ok) return []
   return res.json() as Promise<SearchResult[]>
 }

@@ -5,6 +5,7 @@ import { MobileHeader } from './MobileHeader'
 import { MobileBottomNav } from './MobileBottomNav'
 import { BottomAudioPlayer } from '@/components/audio/BottomAudioPlayer'
 import { FontSettingsModal } from '@/components/settings/FontSettingsModal'
+import { SearchModal } from '@/components/search/SearchModal'
 
 interface MainLayoutProps {
   children: React.ReactNode
@@ -38,6 +39,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       <BottomAudioPlayer />
       <MobileBottomNav />
       <FontSettingsModal />
+      <SearchModal />
     </div>
   )
 }
