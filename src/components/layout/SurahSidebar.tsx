@@ -22,6 +22,16 @@ export function SurahSidebar() {
   const router = useRouter()
   const isSidebarOpen = useUIStore((s) => s.isSidebarOpen)
   const setSidebarOpen = useUIStore((s) => s.setSidebarOpen)
+  const isSidebarSearchOpen = useUIStore((s) => s.isSidebarSearchOpen)
+  const setSidebarSearchOpen = useUIStore((s) => s.setSidebarSearchOpen)
+
+  // Activate search mode when triggered externally (e.g. mobile header search icon)
+  useEffect(() => {
+    if (isSidebarSearchOpen) {
+      setIsSearchMode(true)
+      setSidebarSearchOpen(false)
+    }
+  }, [isSidebarSearchOpen, setSidebarSearchOpen])
 
   useEffect(() => {
     getAllSurahs().then(setSurahs).catch(console.error)

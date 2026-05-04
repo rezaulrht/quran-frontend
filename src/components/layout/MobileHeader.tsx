@@ -6,7 +6,13 @@ import { useUIStore } from '@/store/uiStore'
 
 export function MobileHeader() {
   const setSidebarOpen = useUIStore((s) => s.setSidebarOpen)
+  const setSidebarSearchOpen = useUIStore((s) => s.setSidebarSearchOpen)
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen)
+
+  function handleSearchClick() {
+    setSidebarSearchOpen(true)
+    setSidebarOpen(true)
+  }
 
   return (
     <header className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center border-b border-qm-border bg-qm-surface px-4 md:hidden">
@@ -27,6 +33,7 @@ export function MobileHeader() {
         <button
           type="button"
           aria-label="Search"
+          onClick={handleSearchClick}
           className="flex h-11 w-11 items-center justify-center text-qm-text-faint transition-colors hover:text-qm-text"
         >
           <Search size={20} />
