@@ -156,7 +156,7 @@ export function SurahSidebar() {
                   <span
                     dir="rtl"
                     lang="ar"
-                    className="shrink-0 text-right font-amiri text-[22px] leading-tight text-qm-text-muted"
+                    className="shrink-0 text-right font-calligraphy text-[22px] leading-tight text-qm-text-muted"
                   >
                     {surah.name}
                   </span>

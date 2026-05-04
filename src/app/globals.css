@@ -2,6 +2,14 @@
 @config "../../tailwind.config.ts";
 
 @font-face {
+  font-family: 'Calligraphy';
+  src: url('/fonts/calligraphy.woff2') format('woff2');
+  font-display: swap;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
   font-family: 'kfgq';
   src: url('https://cdn.jsdelivr.net/gh/aliftype/quran-fonts@main/fonts/kfgqpc-hafs-one-regular.woff2') format('woff2'),
        url('https://fonts.qurancomplex.gov.sa/QCF_BSML_COLOR_1_00/QCF_BSML_COLOR_1_00.woff') format('woff');
