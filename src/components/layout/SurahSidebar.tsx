@@ -6,6 +6,7 @@ import { Search, X } from 'lucide-react'
 import { clsx } from 'clsx'
 import { getAllSurahs } from '@/lib/api'
 import { SearchBar } from '@/components/search/SearchBar'
+import { useUIStore } from '@/store/uiStore'
 import type { Surah } from '@/types/quran'
 
 type Tab = 'Surah' | 'Juz' | 'Page'
@@ -19,6 +20,8 @@ export function SurahSidebar() {
   const [isSearchMode, setIsSearchMode] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
+  const isSidebarOpen = useUIStore((s) => s.isSidebarOpen)
+  const setSidebarOpen = useUIStore((s) => s.setSidebarOpen)
 
   useEffect(() => {
     getAllSurahs().then(setSurahs).catch(console.error)
@@ -42,7 +45,23 @@ export function SurahSidebar() {
       : surahs
 
   return (
-    <aside className="fixed left-[50px] top-0 z-10 flex h-full w-[280px] flex-col border-r border-qm-border bg-qm-surface">
+    <>
+      {/* Mobile overlay — closes drawer on tap */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        className={clsx(
+          'fixed left-0 top-0 z-50 flex h-full w-[280px] flex-col border-r border-qm-border bg-qm-surface transition-transform duration-300',
+          'md:left-[50px] md:z-10 md:translate-x-0',
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
+        )}
+      >
       {/* Header row: tabs + search toggle */}
       <div className="flex items-center gap-1 p-3">
         {!isSearchMode ? (
@@ -112,7 +131,7 @@ export function SurahSidebar() {
                 <button
                   key={surah.id}
                   type="button"
-                  onClick={() => router.push(`/surah/${surah.id}`)}
+                  onClick={() => { router.push(`/surah/${surah.id}`); setSidebarOpen(false) }}
                   className={clsx(
                     'flex w-full items-center gap-3 px-3 py-3 text-left transition-colors',
                     isActive ? 'bg-qm-green-dark' : 'hover:bg-qm-surface2',
@@ -147,6 +166,7 @@ export function SurahSidebar() {
           </div>
         </>
       )}
-    </aside>
+      </aside>
+    </>
   )
 }
