@@ -15,7 +15,7 @@ interface SettingsState {
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
-      arabicFont: 'kfgq',
+      arabicFont: 'kfgq, serif',
       arabicFontSize: 30,
       translationFontSize: 17,
       setArabicFont: (font) => set({ arabicFont: font }),

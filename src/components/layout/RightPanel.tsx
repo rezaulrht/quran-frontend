@@ -2,6 +2,7 @@
 
 import { clsx } from 'clsx'
 import { useState } from 'react'
+import { FontSettingsPanel } from '@/components/settings/FontSettingsPanel'
 
 type PanelTab = 'Translation' | 'Reading'
 
@@ -17,6 +18,7 @@ export function RightPanel() {
         {PANEL_TABS.map((tab) => (
           <button
             key={tab}
+            type="button"
             onClick={() => setActiveTab(tab)}
             className={clsx(
               'flex-1 rounded-full py-1.5 text-sm font-medium transition-colors',
@@ -30,15 +32,10 @@ export function RightPanel() {
         ))}
       </div>
 
-      {/* Section label */}
-      <div className="px-3 pb-2">
-        <p className="text-xs font-semibold uppercase tracking-wider text-qm-text-muted">
-          Font Settings
-        </p>
+      {/* Settings content */}
+      <div className="flex-1 overflow-y-auto">
+        <FontSettingsPanel />
       </div>
-
-      {/* Settings panel — populated in Phase 6 */}
-      <div className="flex-1 overflow-y-auto" />
     </aside>
   )
 }
