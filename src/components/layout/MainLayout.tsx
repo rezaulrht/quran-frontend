@@ -12,7 +12,7 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   return (
-    <div className="flex min-h-screen bg-qm-bg">
+    <div className="flex h-screen bg-qm-bg">
       {/* Mobile header — visible only on mobile, fixed at top */}
       <MobileHeader />
 

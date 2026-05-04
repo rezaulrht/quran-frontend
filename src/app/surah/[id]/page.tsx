@@ -21,12 +21,12 @@ export default async function SurahPage({ params }: SurahPageProps) {
   return (
     <div className="w-full">
       {/* Sticky Surah Header */}
-      <div className="sticky top-0 z-10 border-b border-qm-border bg-qm-bg/95 px-4 py-4 text-center backdrop-blur-sm md:px-8">
+      <div className="sticky top-0 z-20 w-full border-b border-qm-border bg-qm-bg/95 px-4 py-4 text-center backdrop-blur-sm md:px-8">
         <h1 className="text-xl font-bold text-qm-text">{surah.transliteration}</h1>
         <p
           dir="rtl"
           lang="ar"
-          className="mt-1 text-right font-arabic text-base text-qm-text-muted"
+          className="mt-1 w-full text-center font-calligraphy text-lg text-qm-text-muted"
         >
           {surah.name}
         </p>
