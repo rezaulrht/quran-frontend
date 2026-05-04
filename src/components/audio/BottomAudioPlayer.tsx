@@ -5,7 +5,7 @@ import { Play, Pause, SkipBack, SkipForward, X } from 'lucide-react'
 import { useAudioStore } from '@/store/audioStore'
 import { triggerAutoPlay, getGlobalAudio } from '@/hooks/useAudioPlayer'
 
-export function MobileAudioPlayer() {
+export function BottomAudioPlayer() {
   const currentPlayingId = useAudioStore((s) => s.currentPlayingId)
   const isPlaying = useAudioStore((s) => s.isPlaying)
   const setPlaying = useAudioStore((s) => s.setPlaying)
@@ -79,7 +79,7 @@ export function MobileAudioPlayer() {
   if (currentPlayingId === null) return null
 
   return (
-    <div className="fixed bottom-14 left-0 right-0 z-20 flex flex-col border-t border-qm-border bg-qm-surface md:hidden">
+    <div className="fixed bottom-14 left-0 right-0 z-20 flex flex-col border-t border-qm-border bg-qm-surface md:bottom-0">
       {/* Progress bar */}
       <div className="h-0.5 w-full bg-qm-border2">
         <div
@@ -89,9 +89,18 @@ export function MobileAudioPlayer() {
       </div>
 
       {/* Controls row */}
-      <div className="flex items-center gap-1 px-4 py-2">
-        <span className="w-10 text-xs text-qm-text-muted">{fmt(currentTime)}</span>
+      <div className="flex items-center gap-2 px-4 py-2">
+        {/* Verse info — left */}
+        <div className="hidden min-w-0 flex-col md:flex" style={{ width: '160px' }}>
+          <span className="truncate text-xs font-medium text-qm-text">
+            Verse {currentPlayingId}
+          </span>
+          <span className="text-[11px] text-qm-text-muted">Al-Afasy</span>
+        </div>
 
+        <span className="w-10 text-xs text-qm-text-muted md:hidden">{fmt(currentTime)}</span>
+
+        {/* Center controls */}
         <div className="flex flex-1 items-center justify-center gap-4">
           <button
             type="button"
@@ -121,7 +130,14 @@ export function MobileAudioPlayer() {
           </button>
         </div>
 
-        <span className="w-10 text-right text-xs text-qm-text-muted">{fmt(duration)}</span>
+        {/* Right side — duration on desktop, time on mobile */}
+        <div className="hidden items-center gap-3 md:flex" style={{ width: '160px' }}>
+          <span className="text-xs text-qm-text-muted">{fmt(currentTime)}</span>
+          <span className="text-xs text-qm-text-faint">/</span>
+          <span className="text-xs text-qm-text-muted">{fmt(duration)}</span>
+        </div>
+
+        <span className="w-10 text-right text-xs text-qm-text-muted md:hidden">{fmt(duration)}</span>
 
         <button
           type="button"

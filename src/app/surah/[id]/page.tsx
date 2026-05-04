@@ -1,4 +1,3 @@
-import { BookOpen } from 'lucide-react'
 import { getSurah, getAllSurahs } from '@/lib/api'
 import { AyahCard } from '@/components/ayah/AyahCard'
 
@@ -20,10 +19,9 @@ export default async function SurahPage({ params }: SurahPageProps) {
   const revelationLabel = surah.type === 'Meccan' ? 'Makkah' : 'Madinah'
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <div className="w-full px-4 py-8 md:px-8">
       {/* Surah Header */}
       <div className="mb-10 flex flex-col items-center gap-2 text-center">
-        <BookOpen size={40} className="text-qm-text-muted opacity-50" aria-hidden="true" />
         <h1 className="text-xl font-bold text-qm-text">{surah.transliteration}</h1>
         <p
           dir="rtl"

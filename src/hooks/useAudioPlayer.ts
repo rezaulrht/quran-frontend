@@ -15,6 +15,9 @@ let playGeneration = 0
 // AyahCards register their auto-continue callbacks here
 const endedCallbacks = new Map<number, () => void>()
 
+// Cache of fetched audio URLs to eliminate repeat API calls
+const audioUrlCache = new Map<number, { primary: string; fallback: string }>()
+
 // ONE 'ended' listener on the singleton — never added again
 globalAudio?.addEventListener('ended', () => {
   const { setPlaying } = useAudioStore.getState()
@@ -35,13 +38,28 @@ interface AlQuranAyahResponse {
 async function fetchAudioUrls(
   globalVerseNumber: number,
 ): Promise<{ primary: string; fallback: string }> {
+  const cached = audioUrlCache.get(globalVerseNumber)
+  if (cached) return cached
+
   const res = await fetch(
     `https://api.alquran.cloud/v1/ayah/${globalVerseNumber}/ar.alafasy`,
   )
   if (!res.ok) throw new Error(`AlQuran API error: ${res.status}`)
   const json = (await res.json()) as AlQuranAyahResponse
-  const primary = json.data.audioSecondary[0] ?? json.data.audio
-  return { primary, fallback: json.data.audio }
+  const result = {
+    primary: json.data.audioSecondary[0] ?? json.data.audio,
+    fallback: json.data.audio,
+  }
+  audioUrlCache.set(globalVerseNumber, result)
+  return result
+}
+
+// Silently pre-warm the cache for a verse number without playing it.
+function prefetchAudioUrl(globalVerseNumber: number): void {
+  if (audioUrlCache.has(globalVerseNumber)) return
+  void fetchAudioUrls(globalVerseNumber).catch(() => {
+    // prefetch failure is silent — will retry on actual play
+  })
 }
 
 // Exported so MobileAudioPlayer can attach timeupdate/durationchange listeners.
@@ -82,6 +100,9 @@ export function triggerAutoPlay(globalVerseNumber: number): void {
 
       audio.load()
       void audio.play().catch(() => setPlaying(null, false))
+
+      // Pre-warm next verse so it's instant when the user advances
+      setTimeout(() => prefetchAudioUrl(globalVerseNumber + 1), 1000)
     })
     .catch(() => {
       console.error(`Failed to fetch audio for verse ${globalVerseNumber}`)
@@ -172,6 +193,9 @@ export function useAudioPlayer(
           setPlaying(null, false)
           console.error('Audio play failed:', err)
         })
+
+        // Pre-warm next verse so it's instant when the user advances
+        setTimeout(() => prefetchAudioUrl(globalVerseNumber + 1), 1000)
       } catch (err) {
         setIsLoading(false)
         setError('Failed to fetch audio URL')
