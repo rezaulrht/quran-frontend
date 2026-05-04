@@ -23,6 +23,7 @@ const config: Config = {
       },
       fontFamily: {
         arabic: ['kfgq', 'Scheherazade New', 'Amiri', 'serif'],
+        amiri:  ['var(--font-amiri)', 'Amiri', 'serif'],
         sans:   ['var(--font-inter)', 'system-ui', 'sans-serif'],
       },
       fontSize: {

@@ -124,7 +124,7 @@ export function SurahSidebar() {
           </div>
 
           {/* Surah list */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="surah-sidebar-scroll flex-1 overflow-y-auto">
             {filtered.map((surah) => {
               const isActive = surah.id === activeSurahId
               return (
@@ -156,7 +156,7 @@ export function SurahSidebar() {
                   <span
                     dir="rtl"
                     lang="ar"
-                    className="shrink-0 text-right font-arabic text-[14px] text-qm-text-muted"
+                    className="shrink-0 text-right font-amiri text-[22px] leading-tight text-qm-text-muted"
                   >
                     {surah.name}
                   </span>
